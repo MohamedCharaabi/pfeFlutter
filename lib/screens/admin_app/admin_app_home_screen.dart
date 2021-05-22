@@ -1,19 +1,19 @@
-import 'package:bottom_navigation/screens/Home.dart';
-import 'package:bottom_navigation/screens/Settings.dart';
-import 'package:bottom_navigation/screens/Statistics.dart';
-import 'package:bottom_navigation/screens/fitness_app/models/tabIcon_data.dart';
+import 'package:bottom_navigation/screens/admin_app/models/tabIcon_data.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/Home.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/Settings.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/Statistics.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/drawer_user_controller.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/home_drawer.dart';
 import 'package:flutter/material.dart';
 import 'bottom_navigation_view/bottom_bar_view.dart';
-import 'fintness_app_theme.dart';
+import 'admin_app_theme.dart';
 
-class FitnessAppHomeScreen extends StatefulWidget {
+class AdminAppHomeScreen extends StatefulWidget {
   @override
-  _FitnessAppHomeScreenState createState() => _FitnessAppHomeScreenState();
+  _AdminAppHomeScreenState createState() => _AdminAppHomeScreenState();
 }
 
-class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
+class _AdminAppHomeScreenState extends State<AdminAppHomeScreen>
     with TickerProviderStateMixin {
   AnimationController animationController;
 
@@ -38,7 +38,7 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
   @override
   void initState() {
     drawerIndex = DrawerIndex.HOME;
-    screenView = Home();
+    screenView = Statistics();
 
     tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;

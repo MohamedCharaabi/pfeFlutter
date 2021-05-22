@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:bottom_navigation/main.dart';
-import 'package:bottom_navigation/screens/mainPage.dart';
+import 'package:bottom_navigation/screens/admin_app/admin_app_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -31,8 +31,8 @@ class _RegisterState extends State<Register> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     if (token != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPage()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => AdminAppHomeScreen()));
     }
   }
 
@@ -177,7 +177,7 @@ class _RegisterState extends State<Register> {
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            MainPage()));
+                                                            AdminAppHomeScreen()));
                                               }
                                             },
                                             shape: RoundedRectangleBorder(

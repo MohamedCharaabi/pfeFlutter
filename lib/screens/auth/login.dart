@@ -1,11 +1,14 @@
 import 'dart:convert';
 
-import 'package:bottom_navigation/screens/mainPage.dart';
+import 'package:bottom_navigation/screens/admin_app/admin_app_home_screen.dart';
+import 'package:bottom_navigation/screens/admin_app/admin_app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colored_progress_indicators/flutter_colored_progress_indicators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bottom_navigation/screens/admin_app/hexColor.dart';
 
 class Login extends StatefulWidget {
   // static final String path = "lib/src/pages/login/login12.dart";
@@ -17,9 +20,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController _emailController = new TextEditingController();
   TextEditingController _passController = new TextEditingController();
-
+  bool isLoading = false;
   login(email, password) async {
-    var url = "https://pfe-cims.herokuapp.com/user/login"; // iOS
+    var url = "https://pfe-cims.herokuapp.com/new/login"; // iOS
 
     try {
       final http.Response response = await http.post(
@@ -28,19 +31,42 @@ class _LoginState extends State<Login> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String, String>{
-          'emailPer': email,
-          'passPer': password,
+          'email': email,
+          'password': password,
         }),
       );
-      print(response.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      var parse = jsonDecode(response.body);
-      await prefs.setString('token', parse["token"]);
+      print(' res ==> ${response.body}');
+      if (response.statusCode == 200) {
+        String role = jsonDecode(response.body)['userData']['role'];
+        if (role == 'admin') {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          var userData = jsonDecode(response.body)["userData"];
+          await prefs.setString('userData', jsonEncode(userData));
+        } else {
+          Fluttertoast.showToast(
+              msg: "This is not an Admin account",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: jsonDecode(response.body)['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blueGrey,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     } catch (e) {
       Fluttertoast.showToast(
           msg: "Error $e",
           toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
@@ -54,11 +80,13 @@ class _LoginState extends State<Login> {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-          Colors.orange[900],
-          Colors.orange[800],
-          Colors.orange[400]
-        ])),
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+              FitnessAppTheme.nearlyDarkBlue,
+              HexColor('#6A88E5'),
+            ])),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -170,26 +198,46 @@ class _LoginState extends State<Login> {
                             1.6,
                             InkWell(
                               onTap: () async {
+                                setState(() {
+                                  isLoading = true;
+                                });
                                 await login(_emailController.text,
                                     _passController.text);
-
+                                setState(() {
+                                  isLoading = false;
+                                });
                                 SharedPreferences prefs =
                                     await SharedPreferences.getInstance();
-                                String token = prefs.getString("token");
-                                print(token);
-                                if (token != null) {
-                                  Navigator.push(
+                                String userData = prefs.getString("userData");
+                                // print('userData ==> $userData');
+                                if (userData != null) {
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MainPage()));
+                                          builder: (context) =>
+                                              AdminAppHomeScreen()));
                                 }
                               },
                               child: Container(
                                 height: 50,
-                                margin: EdgeInsets.symmetric(horizontal: 50),
+                                padding: EdgeInsets.symmetric(horizontal: 40),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
-                                    color: Colors.orange[900]),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        FitnessAppTheme.nearlyDarkBlue,
+                                        HexColor('#6A88E5'),
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color:
+                                              Color.fromRGBO(225, 95, 27, .3),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10))
+                                    ]),
                                 child: Center(
                                   child: Text(
                                     "Login",
@@ -200,6 +248,14 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                             )),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        isLoading
+                            ? ColoredLinearProgressIndicator()
+                            : SizedBox(
+                                height: 0,
+                              ),
                         SizedBox(
                           height: 50,
                         ),

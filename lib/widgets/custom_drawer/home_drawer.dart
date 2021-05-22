@@ -1,5 +1,9 @@
+import 'dart:convert';
+
+import 'package:bottom_navigation/screens/auth/login.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/drawer_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer(
@@ -19,9 +23,19 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   List<DrawerList> drawerList;
+  Map<String, dynamic> userData = {};
+  getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = jsonDecode(prefs.getString("userData"));
+    setState(() {
+      userData = data;
+    });
+  }
+
   @override
   void initState() {
     setDrawerListArray();
+    getUserData();
     super.initState();
   }
 
@@ -30,33 +44,43 @@ class _HomeDrawerState extends State<HomeDrawer> {
       DrawerList(
         index: DrawerIndex.HOME,
         labelName: 'Home',
-        icon: Icon(Icons.home),
+        icon: Icon(Icons.dashboard),
       ),
       DrawerList(
         index: DrawerIndex.Help,
-        labelName: 'Help',
+        labelName: 'Requests',
         isAssetsImage: true,
-        imageName: 'assets/images/supportIcon.png',
+        imageName: 'assets/images/requestIcon.png',
       ),
       DrawerList(
         index: DrawerIndex.FeedBack,
-        labelName: 'FeedBack',
-        icon: Icon(Icons.help),
+        labelName: 'Themes',
+        isAssetsImage: true,
+        imageName: 'assets/images/template.png',
       ),
       DrawerList(
         index: DrawerIndex.Invite,
-        labelName: 'Invite Friend',
-        icon: Icon(Icons.group),
+        labelName: 'Departments',
+        isAssetsImage: true,
+        imageName: 'assets/images/departmentIcon.png',
       ),
       DrawerList(
         index: DrawerIndex.Share,
-        labelName: 'Rate the app',
-        icon: Icon(Icons.share),
+        labelName: 'Directions',
+        isAssetsImage: true,
+        imageName: 'assets/images/directionIcon.png',
       ),
       DrawerList(
         index: DrawerIndex.About,
-        labelName: 'About Us',
-        icon: Icon(Icons.info),
+        labelName: 'Divisions',
+        isAssetsImage: true,
+        imageName: 'assets/images/divisionIcon.png',
+      ),
+      DrawerList(
+        index: DrawerIndex.About,
+        labelName: 'Services',
+        isAssetsImage: true,
+        imageName: 'assets/images/serviceIcon.png',
       ),
     ];
   }
@@ -117,7 +141,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8, left: 4),
                     child: Text(
-                      'Chris Hemsworth',
+                      userData['fullName'] ?? '',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -167,8 +191,16 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Icons.power_settings_new,
                   color: Colors.red,
                 ),
-                onTap: () {
-                  onTapped();
+                onTap: () async {
+                  // onTapped();
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.remove('userData');
+                  String userData = prefs.getString("userData");
+                  if (userData == null) {
+                    Navigator.pushReplacement((context),
+                        MaterialPageRoute(builder: (context) => Login()));
+                  }
                 },
               ),
               SizedBox(
@@ -176,6 +208,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
               )
             ],
           ),
+          SizedBox(
+            height: 50,
+          )
         ],
       ),
     );

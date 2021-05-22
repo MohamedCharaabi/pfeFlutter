@@ -1,8 +1,8 @@
 import 'package:bottom_navigation/colors.dart';
 
 import 'package:bottom_navigation/screens/auth/login.dart';
-import 'package:bottom_navigation/screens/fitness_app/fitness_app_home_screen.dart';
-import 'package:bottom_navigation/screens/mainPage.dart';
+import 'package:bottom_navigation/screens/admin_app/admin_app_home_screen.dart';
+// import 'package:bottom_navigation/screens/mainPage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,34 +12,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String token = prefs.getString("token");
-  print(' token ==> $token ');
+  String userData = prefs.getString("userData");
+  print(' userData ==> $userData ');
 
-  if (token == null) {
-    runApp(ChangeNotifierProvider(
-      create: (context) => ColorProvider(),
-      child: MyApp(
-        page: Login(),
-      ),
-    ));
-  } else {
-    runApp(ChangeNotifierProvider(
-      create: (context) => ColorProvider(),
-      child: MyApp(
-        page: FitnessAppHomeScreen(),
-      ),
-    ));
-  }
-
-  // runApp(ChangeNotifierProvider(
-  //   create: (context) => ColorProvider(),
-  //   child: MyApp(),
-  // ));
+  runApp(MyApp(page: userData != null ? AdminAppHomeScreen() : Login()));
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-
   final Widget page;
 
   MyApp({this.page});
