@@ -74,6 +74,13 @@ class _LoginState extends State<Login> {
     }
   }
 
+  bool _obscureText = true;
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,7 +179,14 @@ class _LoginState extends State<Login> {
                                       controller: _passController,
                                       keyboardType:
                                           TextInputType.visiblePassword,
+                                      obscureText: _obscureText,
                                       decoration: InputDecoration(
+                                          suffixIcon: IconButton(
+                                            icon: Icon(_obscureText
+                                                ? Icons.visibility_off_outlined
+                                                : Icons.visibility),
+                                            onPressed: _toggle,
+                                          ),
                                           hintText: "Password",
                                           hintStyle:
                                               TextStyle(color: Colors.grey),
