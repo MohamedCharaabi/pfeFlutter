@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bottom_navigation/colors.dart';
 import 'package:bottom_navigation/constants/Theme.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_theme.dart';
+import 'package:bottom_navigation/screens/admin_app/models/Request.dart';
+// import 'package:bottom_navigation/screens/admin_app/screens/flipTest.dart';
+import 'package:bottom_navigation/screens/admin_app/widgets/flipItem.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,13 +22,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Future<List<dynamic>> getRequests() async {
+  Future<List<PersonalRequest>> getRequests() async {
     var result =
         await http.get(Uri.parse('https://pfe-cims.herokuapp.com/request'));
 
     // print(result.body);
-
-    return json.decode(result.body);
+    if (result.statusCode == 200) {
+      var response = json.decode(result.body);
+      List<PersonalRequest> requests = [];
+      for (var item in response) {
+        requests.add(PersonalRequest.fromJson(item));
+      }
+      return requests;
+    }
+    log('Errorrr while parsing requests <<check getRequets methode in home >>');
   }
 
   List<String> countList = [
@@ -114,7 +125,7 @@ class _HomeState extends State<Home> {
               children: [
                 // SizedBox(height: 15,),
 
-                FutureBuilder<List<dynamic>>(
+                FutureBuilder<List<PersonalRequest>>(
                   future: getRequests(),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData) {
@@ -131,61 +142,92 @@ class _HomeState extends State<Home> {
                             padding: EdgeInsets.all(8),
                             itemCount: snapshot.data.length,
                             itemBuilder: (BuildContext context, int index) {
-                              final r = snapshot.data[index];
+                              PersonalRequest snap = snapshot.data[index];
                               String date = DateFormat('yMd')
-                                  .format(DateTime.parse(r['dateDem']));
-                              String theme = r['themeDem'];
+                                  .format(DateTime.parse(snap.date));
+                              String theme = snap.theme;
                               if (selectedThemeList.contains(theme)) {
                                 return Container(
-                                  height: height * 0.12,
-                                  width: width,
-                                  margin: EdgeInsets.only(top: 15),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 10),
-                                  decoration: BoxDecoration(
-                                      color: FitnessAppTheme.nearlyDarkBlue,
-                                      gradient: LinearGradient(
-                                          colors: [
-                                            FitnessAppTheme.nearlyDarkBlue,
-                                            HexColor('#6A88E5'),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight),
-                                      borderRadius: BorderRadius.circular(22)),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        '${r['themeDem']}',
-                                        style:
-                                            TextStyle(color: ArgonColors.white),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            '${r['nomDem']} ${r['prenomDem']}',
-                                            style: TextStyle(
-                                                color: ArgonColors.white),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            '${r['emailDem']}',
-                                            style: TextStyle(
-                                                color: ArgonColors.white),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                  margin: EdgeInsets.only(top: 10),
+                                  child: FlipItem(
+                                    request: snap,
                                   ),
                                 );
+                                // return Container(
+                                //   height: height * 0.12,
+                                //   width: width,
+                                //   margin: EdgeInsets.only(top: 15),
+                                //   padding: EdgeInsets.symmetric(
+                                //       horizontal: 10, vertical: 10),
+                                //   decoration: BoxDecoration(
+                                //       color: FitnessAppTheme.nearlyDarkBlue,
+                                //       gradient: LinearGradient(
+                                //           colors: [
+                                //             FitnessAppTheme.nearlyDarkBlue,
+                                //             HexColor('#6A88E5'),
+                                //           ],
+                                //           begin: Alignment.topLeft,
+                                //           end: Alignment.bottomRight),
+                                //       borderRadius: BorderRadius.circular(22)),
+                                //   child: Row(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.start,
+                                //     mainAxisAlignment:
+                                //         MainAxisAlignment.spaceBetween,
+                                //     children: <Widget>[
+                                //       Row(
+                                //         children: <Widget>[
+                                //           Container(
+                                //             width: width * 0.2,
+                                //             child: Text(
+                                //               '${r['themeDem']}',
+                                //               style: TextStyle(
+                                //                   color: ArgonColors.white),
+                                //             ),
+                                //           ),
+                                //           Column(
+                                //             crossAxisAlignment:
+                                //                 CrossAxisAlignment.start,
+                                //             children: <Widget>[
+                                //               Text(
+                                //                 '${r['nomDem']} ${r['prenomDem']}',
+                                //                 style: TextStyle(
+                                //                     color: ArgonColors.white),
+                                //               ),
+                                //               SizedBox(
+                                //                 height: 5,
+                                //               ),
+                                //               Text(
+                                //                 '${r['emailDem']}',
+                                //                 style: TextStyle(
+                                //                     color: ArgonColors.white),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ],
+                                //       ),
+                                //       PopupMenuButton(
+                                //         icon: Icon(
+                                //           Icons.more_vert,
+                                //           color: Colors.white,
+                                //         ),
+                                //         itemBuilder: (BuildContext context) =>
+                                //             <PopupMenuEntry>[
+                                //           const PopupMenuItem(
+                                //             child: ListTile(
+                                //               leading: Icon(Icons.details),
+                                //               title: Text('Voir Details'),
+                                //               // onTap: () {
+                                //               //  return log('${r['themeDem']}');
+                                //               // }
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //     ],
+                                //   ),
+                                // );
+
                               }
                               return SizedBox(
                                 height: 0,
