@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:bottom_navigation/constants/formValidation.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_home_screen.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colored_progress_indicators/flutter_colored_progress_indicators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_state_button/iconed_button.dart';
+import 'package:progress_state_button/progress_button.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +24,7 @@ class _LoginState extends State<Login> {
   TextEditingController _emailController = new TextEditingController();
   TextEditingController _passController = new TextEditingController();
   bool isLoading = false;
+  ButtonState buttonState = ButtonState.idle;
   login(email, password) async {
     var url = "https://pfe-cims.herokuapp.com/new/login"; // iOS
 
@@ -42,6 +46,9 @@ class _LoginState extends State<Login> {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           var userData = jsonDecode(response.body)["userData"];
           await prefs.setString('userData', jsonEncode(userData));
+          setState(() {
+            buttonState = ButtonState.success;
+          });
         } else {
           Fluttertoast.showToast(
               msg: "This is not an Admin account",
@@ -51,8 +58,14 @@ class _LoginState extends State<Login> {
               backgroundColor: Colors.red,
               textColor: Colors.white,
               fontSize: 16.0);
+          setState(() {
+            buttonState = ButtonState.fail;
+          });
         }
       } else {
+        setState(() {
+          buttonState = ButtonState.fail;
+        });
         Fluttertoast.showToast(
             msg: jsonDecode(response.body)['message'],
             toastLength: Toast.LENGTH_SHORT,
@@ -63,17 +76,21 @@ class _LoginState extends State<Login> {
             fontSize: 16.0);
       }
     } catch (e) {
+      setState(() {
+        buttonState = ButtonState.fail;
+      });
       Fluttertoast.showToast(
-          msg: "Error $e",
+          msg: "Error ==> $e",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.grey.shade400,
           textColor: Colors.white,
           fontSize: 16.0);
     }
   }
 
+  final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
   void _toggle() {
     setState(() {
@@ -134,117 +151,19 @@ class _LoginState extends State<Login> {
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: EdgeInsets.all(30),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 60,
-                        ),
-                        FadeAnimation(
-                            1.4,
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Color.fromRGBO(225, 95, 27, .3),
-                                        blurRadius: 20,
-                                        offset: Offset(0, 10))
-                                  ]),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.grey[200]))),
-                                    child: TextField(
-                                      controller: _emailController,
-                                      keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
-                                          hintText: "Email ",
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: InputBorder.none),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.grey[200]))),
-                                    child: TextField(
-                                      controller: _passController,
-                                      keyboardType:
-                                          TextInputType.visiblePassword,
-                                      obscureText: _obscureText,
-                                      decoration: InputDecoration(
-                                          suffixIcon: IconButton(
-                                            icon: Icon(_obscureText
-                                                ? Icons.visibility_off_outlined
-                                                : Icons.visibility),
-                                            onPressed: _toggle,
-                                          ),
-                                          hintText: "Password",
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: InputBorder.none),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                        SizedBox(
-                          height: 40,
-                        ),
-                        FadeAnimation(
-                            1.5,
-                            Text(
-                              "Forgot Password?",
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        FadeAnimation(
-                            1.6,
-                            InkWell(
-                              onTap: () async {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                await login(_emailController.text,
-                                    _passController.text);
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                String userData = prefs.getString("userData");
-                                // print('userData ==> $userData');
-                                if (userData != null) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AdminAppHomeScreen()));
-                                }
-                              },
-                              child: Container(
-                                height: 50,
-                                padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 60,
+                          ),
+                          FadeAnimation(
+                              1.4,
+                              Container(
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        FitnessAppTheme.nearlyDarkBlue,
-                                        HexColor('#6A88E5'),
-                                      ],
-                                    ),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
                                     boxShadow: [
                                       BoxShadow(
                                           color:
@@ -252,28 +171,135 @@ class _LoginState extends State<Login> {
                                           blurRadius: 20,
                                           offset: Offset(0, 10))
                                     ]),
-                                child: Center(
-                                  child: Text(
-                                    "Login",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey[200]))),
+                                      child: TextFormField(
+                                        controller: _emailController,
+                                        validator: (val) {
+                                          return emailValidation(val);
+                                        },
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        decoration: InputDecoration(
+                                            hintText: "Email ",
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
+                                            border: InputBorder.none),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey[200]))),
+                                      child: TextFormField(
+                                        controller: _passController,
+                                        validator: (val) {
+                                          return passwordlValidation(val);
+                                        },
+                                        keyboardType:
+                                            TextInputType.visiblePassword,
+                                        obscureText: _obscureText,
+                                        decoration: InputDecoration(
+                                            suffixIcon: IconButton(
+                                              icon: Icon(_obscureText
+                                                  ? Icons
+                                                      .visibility_off_outlined
+                                                  : Icons.visibility),
+                                              onPressed: _toggle,
+                                            ),
+                                            hintText: "Password",
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
+                                            border: InputBorder.none),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            )),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        isLoading
-                            ? ColoredLinearProgressIndicator()
-                            : SizedBox(
-                                height: 0,
-                              ),
-                        SizedBox(
-                          height: 50,
-                        ),
-                      ],
+                              )),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          FadeAnimation(
+                              1.5,
+                              Text(
+                                "Forgot Password?",
+                                style: TextStyle(color: Colors.grey),
+                              )),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          FadeAnimation(
+                            1.6,
+                            ProgressButton.icon(
+                              iconedButtons: {
+                                ButtonState.idle: IconedButton(
+                                    text: "Login",
+                                    icon:
+                                        Icon(Icons.login, color: Colors.white),
+                                    color: Colors.deepPurple.shade500),
+                                ButtonState.loading: IconedButton(
+                                    text: "Loading",
+                                    color: Colors.deepPurple.shade700),
+                                ButtonState.fail: IconedButton(
+                                    text: "Failed",
+                                    icon:
+                                        Icon(Icons.cancel, color: Colors.white),
+                                    color: Colors.red.shade300),
+                                ButtonState.success: IconedButton(
+                                    text: "Success",
+                                    icon: Icon(
+                                      Icons.check_circle,
+                                      color: Colors.white,
+                                    ),
+                                    color: Colors.green.shade400)
+                              },
+                              onPressed: () async {
+                                if (_formKey.currentState.validate()) {
+                                  setState(() {
+                                    buttonState = ButtonState.loading;
+                                  });
+                                  await login(_emailController.text,
+                                      _passController.text);
+                                  // setState(() {
+                                  //   isLoading = false;
+                                  // });
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  String userData = prefs.getString("userData");
+                                  // print('userData ==> $userData');
+                                  if (userData != null) {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdminAppHomeScreen()));
+                                  }
+                                }
+                              },
+                              state: buttonState,
+                            ),
+                            // SizedBox(
+                            //   height: 20,
+                            // ),
+                            // isLoading
+                            //     ? ColoredLinearProgressIndicator()
+                            //     : SizedBox(
+                            //         height: 0,
+                            //       ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

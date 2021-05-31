@@ -13,17 +13,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
-class AddDirection extends StatefulWidget {
+class AddDivision extends StatefulWidget {
   @override
-  _AddDirectionState createState() => _AddDirectionState();
+  _AddDivisionState createState() => _AddDivisionState();
 }
 
-class _AddDirectionState extends State<AddDirection> {
-  TextEditingController _dirController = new TextEditingController();
+class _AddDivisionState extends State<AddDivision> {
+  TextEditingController _divController = new TextEditingController();
   Map<String, String> _formData = {'name': '', 'dep_name': ''};
   bool isLoading = true;
   String _selectDep = '';
-  List<String> departments = [];
+  List<String> fetchDepartments = [];
+  List<String> fetchDirections = [];
   ButtonState buttonState = ButtonState.idle;
   final _formKey = GlobalKey<FormState>();
   _submit(name, selectedDep) async {
@@ -72,20 +73,27 @@ class _AddDirectionState extends State<AddDirection> {
 
   Future<String> getDeps() async {
     final response =
-        await http.get(Uri.parse('https://pfe-cims.herokuapp.com/dep'));
+        await http.get(Uri.parse('https://pfe-cims.herokuapp.com/all'));
 
     if (response.statusCode == 200) {
       List<String> deps = [];
+      List<String> dirs = [];
 
-      var result = json.decode(response.body);
+      var departments = json.decode(response.body)['departments'];
+      var directions = json.decode(response.body)['directions'];
 
-      for (var dep in result) {
+      for (var dep in departments) {
         // deps.add(Department.fromJson(dep));
         deps.add(dep['name']);
       }
+      for (var dir in directions) {
+        // deps.add(Department.fromJson(dir));
+        dirs.add(dir['name']);
+      }
       log(' deps ===> $deps');
       setState(() {
-        departments = deps;
+        fetchDepartments = deps;
+        fetchDirections = dirs;
         isLoading = false;
       });
 
@@ -143,7 +151,7 @@ class _AddDirectionState extends State<AddDirection> {
           baseColor: Colors.blueAccent,
           period: Duration(seconds: 5),
           child: Text(
-            'Ajout Direction',
+            'Ajout Division',
             style: TextStyle(color: Colors.black),
           ),
         ),
@@ -183,14 +191,14 @@ class _AddDirectionState extends State<AddDirection> {
                                           bottom: BorderSide(
                                               color: Colors.grey[200]))),
                                   child: TextFormField(
-                                    controller: _dirController,
+                                    controller: _divController,
                                     validator: (val) {
                                       return standarTextValidation(
-                                          val, 'direction name');
+                                          val, 'Division name');
                                     },
                                     keyboardType: TextInputType.text,
                                     decoration: InputDecoration(
-                                        hintText: "Direction name ",
+                                        hintText: "Division name ",
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
                                         border: InputBorder.none),
@@ -218,10 +226,12 @@ class _AddDirectionState extends State<AddDirection> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
-                                    Expanded(
+                                    Container(
+                                      height: 60,
+                                      width: width * 0.75,
                                       child: Padding(
                                         child: DirectSelectList<String>(
-                                            values: departments,
+                                            values: fetchDepartments,
                                             defaultItemIndex: 0,
                                             itemBuilder: (String value) =>
                                                 getDropDownMenuItem(value),
@@ -251,6 +261,55 @@ class _AddDirectionState extends State<AddDirection> {
                           ),
                           FadeAnimation(
                             1.6,
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color:
+                                              Color.fromRGBO(225, 95, 27, .3),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10))
+                                    ]),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Padding(
+                                        child: DirectSelectList<String>(
+                                            values: fetchDirections,
+                                            defaultItemIndex: 0,
+                                            itemBuilder: (String value) =>
+                                                getDropDownMenuItem(value),
+                                            focusedItemDecoration:
+                                                _getDslDecoration(),
+                                            onItemSelectedListener:
+                                                (item, index, context) {
+                                              _selectDep = item;
+                                            }),
+                                        padding: EdgeInsets.only(left: 12),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.unfold_more,
+                                        color: Colors.black38,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          FadeAnimation(
+                            1.8,
                             ProgressButton.icon(
                               iconedButtons: {
                                 ButtonState.idle: IconedButton(
@@ -279,7 +338,7 @@ class _AddDirectionState extends State<AddDirection> {
                                     buttonState = ButtonState.loading;
                                   });
                                   await _submit(
-                                      _dirController.text, _selectDep);
+                                      _divController.text, _selectDep);
                                 }
                               },
                               state: buttonState,

@@ -5,6 +5,8 @@ import 'package:bottom_navigation/screens/admin_app/hexColor.dart';
 import 'package:bottom_navigation/screens/admin_app/models/tabIcon_data.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/addDepartment.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/addDirection.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/addDivision.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/addService.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/departments.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/directions.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/divisions.dart';
@@ -254,7 +256,8 @@ class _BottomBarViewState extends State<BottomBarView>
                                     Navigator.push(
                                         (context),
                                         MaterialPageRoute(
-                                            builder: (context) => Services()));
+                                            builder: (context) =>
+                                                AddService()));
                                   },
                                 ),
                               ),
@@ -334,7 +337,8 @@ class _BottomBarViewState extends State<BottomBarView>
                                     Navigator.push(
                                         (context),
                                         MaterialPageRoute(
-                                            builder: (context) => Divisions()));
+                                            builder: (context) =>
+                                                AddDivision()));
                                   },
                                 ),
                               ),

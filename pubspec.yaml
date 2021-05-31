@@ -47,6 +47,8 @@ dependencies:
   image_picker: ^0.7.5+2
   cloudinary_public: ^0.8.1+1
   shimmer: ^2.0.0
+  flutter_slidable: ^0.6.0
+  progress_state_button: ^1.0.3
 
 dev_dependencies:
   flutter_test:

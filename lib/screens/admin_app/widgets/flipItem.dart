@@ -4,6 +4,9 @@ import 'package:bottom_navigation/screens/admin_app/models/Request.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../admin_app_theme.dart';
+import '../hexColor.dart';
+
 class FlipItem extends StatefulWidget {
   final PersonalRequest request;
   FlipItem({this.request});
@@ -217,11 +220,11 @@ Widget ThemeBox(PersonalRequest request) {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  // color: Colors.blue,
+                  color: FitnessAppTheme.nearlyDarkBlue,
                   borderRadius: BorderRadius.circular(13),
                   gradient: LinearGradient(colors: [
-                    Colors.blueAccent,
-                    Color(0xff6A88E5),
+                    FitnessAppTheme.nearlyDarkBlue,
+                    HexColor('#6A88E5'),
                   ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   boxShadow: [
                     BoxShadow(

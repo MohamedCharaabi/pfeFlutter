@@ -277,25 +277,38 @@ class ShimmerLayout extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 7.5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Container(
-            height: 90,
-            width: 90,
-            color: Colors.grey,
+          Column(
+            children: [
+              Container(
+                height: 15,
+                width: 30,
+                color: Colors.grey,
+                margin: EdgeInsets.only(bottom: 5),
+              ),
+              Container(
+                height: 15,
+                width: 30,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 10,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
                 height: containerHeight,
-                width: containerWidth,
+                width: containerWidth * 0.26,
                 color: Colors.grey,
               ),
               SizedBox(height: 5),
               Container(
                 height: containerHeight,
-                width: containerWidth,
+                width: containerWidth * 0.5,
                 color: Colors.grey,
               ),
               SizedBox(height: 5),

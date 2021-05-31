@@ -47,37 +47,37 @@ class _HomeDrawerState extends State<HomeDrawer> {
         icon: Icon(Icons.dashboard),
       ),
       DrawerList(
-        index: DrawerIndex.Help,
+        index: DrawerIndex.REQUESTS,
         labelName: 'Requests',
         isAssetsImage: true,
         imageName: 'assets/images/requestIcon.png',
       ),
       DrawerList(
-        index: DrawerIndex.FeedBack,
+        index: DrawerIndex.THEMES,
         labelName: 'Themes',
         isAssetsImage: true,
         imageName: 'assets/images/template.png',
       ),
       DrawerList(
-        index: DrawerIndex.Invite,
+        index: DrawerIndex.DEPARTMENTS,
         labelName: 'Departments',
         isAssetsImage: true,
         imageName: 'assets/images/departmentIcon.png',
       ),
       DrawerList(
-        index: DrawerIndex.Share,
+        index: DrawerIndex.DIRECTIONS,
         labelName: 'Directions',
         isAssetsImage: true,
         imageName: 'assets/images/directionIcon.png',
       ),
       DrawerList(
-        index: DrawerIndex.About,
+        index: DrawerIndex.DIVISIONS,
         labelName: 'Divisions',
         isAssetsImage: true,
         imageName: 'assets/images/divisionIcon.png',
       ),
       DrawerList(
-        index: DrawerIndex.About,
+        index: DrawerIndex.SERVICES,
         labelName: 'Services',
         isAssetsImage: true,
         imageName: 'assets/images/serviceIcon.png',
@@ -329,12 +329,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
 enum DrawerIndex {
   HOME,
-  FeedBack,
-  Help,
-  Share,
-  About,
-  Invite,
-  Testing,
+  REQUESTS,
+  THEMES,
+  DEPARTMENTS,
+  DIRECTIONS,
+  DIVISIONS,
+  SERVICES,
 }
 
 class DrawerList {

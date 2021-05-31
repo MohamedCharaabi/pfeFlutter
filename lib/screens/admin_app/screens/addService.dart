@@ -13,12 +13,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
-class AddDirection extends StatefulWidget {
+class AddService extends StatefulWidget {
   @override
-  _AddDirectionState createState() => _AddDirectionState();
+  _AddServiceState createState() => _AddServiceState();
 }
 
-class _AddDirectionState extends State<AddDirection> {
+class _AddServiceState extends State<AddService> {
   TextEditingController _dirController = new TextEditingController();
   Map<String, String> _formData = {'name': '', 'dep_name': ''};
   bool isLoading = true;

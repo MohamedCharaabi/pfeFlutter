@@ -2,11 +2,16 @@ import 'package:bottom_navigation/screens/admin_app/models/tabIcon_data.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/Home.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/Settings.dart';
 import 'package:bottom_navigation/screens/admin_app/screens/Statistics.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/departments.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/directions.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/divisions.dart';
+import 'package:bottom_navigation/screens/admin_app/screens/services.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/drawer_user_controller.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/home_drawer.dart';
 import 'package:flutter/material.dart';
 import 'bottom_navigation_view/bottom_bar_view.dart';
 import 'admin_app_theme.dart';
+import 'screens/Themes.dart';
 
 class AdminAppHomeScreen extends StatefulWidget {
   @override
@@ -181,22 +186,30 @@ class _AdminAppHomeScreenState extends State<AdminAppHomeScreen>
   void changeIndex(DrawerIndex drawerIndexdata) {
     if (drawerIndex != drawerIndexdata) {
       drawerIndex = drawerIndexdata;
+
       if (drawerIndex == DrawerIndex.HOME) {
         setState(() {
           screenView = Home();
         });
-      } else if (drawerIndex == DrawerIndex.Help) {
+      } else if (drawerIndex == DrawerIndex.REQUESTS) {
         setState(() {
           screenView = Statistics();
         });
-      } else if (drawerIndex == DrawerIndex.FeedBack) {
-        setState(() {
-          screenView = Settings();
-        });
-      } else if (drawerIndex == DrawerIndex.Invite) {
-        setState(() {
-          screenView = Settings();
-        });
+      } else if (drawerIndex == DrawerIndex.THEMES) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Themes()));
+      } else if (drawerIndex == DrawerIndex.DEPARTMENTS) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Departments()));
+      } else if (drawerIndex == DrawerIndex.DIRECTIONS) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Directions()));
+      } else if (drawerIndex == DrawerIndex.DIVISIONS) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Divisions()));
+      } else if (drawerIndex == DrawerIndex.SERVICES) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Services()));
       } else {
         //do in your way......
       }
