@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:bottom_navigation/constants/formValidation.dart';
+import 'package:bottom_navigation/screens/admin_app/models/Direction.dart';
+import 'package:bottom_navigation/screens/admin_app/models/Division.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
 import 'package:bottom_navigation/screens/admin_app/models/Department.dart';
@@ -20,22 +22,37 @@ class AddService extends StatefulWidget {
 
 class _AddServiceState extends State<AddService> {
   TextEditingController _dirController = new TextEditingController();
-  Map<String, String> _formData = {'name': '', 'dep_name': ''};
+  Map<String, String> _formData = {
+    'name': '',
+    'dep_name': '',
+    'dir_name': '',
+    'div_name': ''
+  };
   bool isLoading = true;
-  String _selectDep = '';
-  List<String> departments = [];
+  // String _selectDep = '';
+  // List<String> departments = [];
+  List<Department> fetchDepartments = [];
+  List<Direction> fetchDirections = [];
+  List<Division> fetchDivisions = [];
+  List<Direction> _selectDirections = [];
+  List<Division> _selectDivisions = [];
+
   ButtonState buttonState = ButtonState.idle;
   final _formKey = GlobalKey<FormState>();
-  _submit(name, selectedDep) async {
-    var url = "https://pfe-cims.herokuapp.com/dir"; // iOS
+  _submit() async {
+    var url = "https://pfe-cims.herokuapp.com/ser"; // iOS
 
     try {
       var result = await http.post(Uri.parse(url),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: jsonEncode(
-              <String, String>{'name': name, 'dep_name': selectedDep}));
+          body: jsonEncode(<String, String>{
+            'name': _formData['name'],
+            'dep_name': _formData['dep_name'],
+            'dir_name': _formData['dir_name'],
+            'div_name': _formData['div_name'],
+          }));
       log(result.body);
       if (result.statusCode == 200) {
         setState(() {
@@ -70,22 +87,32 @@ class _AddServiceState extends State<AddService> {
     }
   }
 
-  Future<String> getDeps() async {
+  Future<String> getAllLevels() async {
     final response =
-        await http.get(Uri.parse('https://pfe-cims.herokuapp.com/dep'));
+        await http.get(Uri.parse('https://pfe-cims.herokuapp.com/all'));
 
     if (response.statusCode == 200) {
-      List<String> deps = [];
+      List<Department> deps = [];
+      List<Direction> dirs = [];
+      List<Division> divs = [];
 
-      var result = json.decode(response.body);
+      var departments = json.decode(response.body)['departments'];
+      var directions = json.decode(response.body)['directions'];
+      var divisions = json.decode(response.body)['divisions'];
 
-      for (var dep in result) {
-        // deps.add(Department.fromJson(dep));
-        deps.add(dep['name']);
+      for (var dep in departments) {
+        deps.add(Department.fromJson(dep));
       }
-      log(' deps ===> $deps');
+      for (var dir in directions) {
+        dirs.add(Direction.fromJson(dir));
+      }
+      for (var div in divisions) {
+        divs.add(Division.fromJson(div));
+      }
       setState(() {
-        departments = deps;
+        fetchDepartments = deps;
+        fetchDirections = dirs;
+        fetchDivisions = divs;
         isLoading = false;
       });
 
@@ -119,7 +146,7 @@ class _AddServiceState extends State<AddService> {
   @override
   void initState() {
     super.initState();
-    getDeps();
+    getAllLevels();
   }
 
   @override
@@ -143,7 +170,7 @@ class _AddServiceState extends State<AddService> {
           baseColor: Colors.blueAccent,
           period: Duration(seconds: 5),
           child: Text(
-            'Ajout Direction',
+            'Ajout Service',
             style: TextStyle(color: Colors.black),
           ),
         ),
@@ -186,11 +213,13 @@ class _AddServiceState extends State<AddService> {
                                     controller: _dirController,
                                     validator: (val) {
                                       return standarTextValidation(
-                                          val, 'direction name');
+                                          val, 'Service name');
                                     },
+                                    onChanged: (val) =>
+                                        _formData = {..._formData, 'name': val},
                                     keyboardType: TextInputType.text,
                                     decoration: InputDecoration(
-                                        hintText: "Direction name ",
+                                        hintText: "Service name ",
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
                                         border: InputBorder.none),
@@ -218,10 +247,14 @@ class _AddServiceState extends State<AddService> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
-                                    Expanded(
+                                    Container(
+                                      height: 60,
+                                      width: width * 0.75,
                                       child: Padding(
                                         child: DirectSelectList<String>(
-                                            values: departments,
+                                            values: fetchDepartments
+                                                .map((e) => e.name)
+                                                .toList(),
                                             defaultItemIndex: 0,
                                             itemBuilder: (String value) =>
                                                 getDropDownMenuItem(value),
@@ -229,7 +262,151 @@ class _AddServiceState extends State<AddService> {
                                                 _getDslDecoration(),
                                             onItemSelectedListener:
                                                 (item, index, context) {
-                                              _selectDep = item;
+                                              // _selectDep = item;
+                                              _formData = {
+                                                ..._formData,
+                                                'dep_name': item,
+                                                'dir_name': '',
+                                                'div_name': '',
+                                              };
+                                              setState(() {
+                                                _selectDirections =
+                                                    fetchDirections
+                                                        .where((d) =>
+                                                            d.dep_name == item)
+                                                        .toList();
+                                              });
+                                            }),
+                                        padding: EdgeInsets.only(left: 12),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.unfold_more,
+                                        color: Colors.black38,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          FadeAnimation(
+                            1.6,
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color:
+                                              Color.fromRGBO(225, 95, 27, .3),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10))
+                                    ]),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 60,
+                                      width: width * 0.75,
+                                      child: Padding(
+                                        child: DirectSelectList<String>(
+                                            values:
+                                                _formData['dep_name'].length ==
+                                                        0
+                                                    ? ['Select Dep First']
+                                                    : _selectDirections
+                                                        .map((e) => e.name)
+                                                        .toList(),
+                                            defaultItemIndex: 0,
+                                            itemBuilder: (String value) =>
+                                                getDropDownMenuItem(value),
+                                            focusedItemDecoration:
+                                                _getDslDecoration(),
+                                            onItemSelectedListener:
+                                                (item, index, context) {
+                                              _formData = {
+                                                ..._formData,
+                                                'dir_name': item,
+                                                'div_name': ''
+                                              };
+                                              setState(() {
+                                                _selectDivisions =
+                                                    fetchDivisions
+                                                        .where((d) =>
+                                                            d.dir_name == item)
+                                                        .toList();
+                                              });
+                                            }),
+                                        padding: EdgeInsets.only(left: 12),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.unfold_more,
+                                        color: Colors.black38,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          FadeAnimation(
+                            1.6,
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color:
+                                              Color.fromRGBO(225, 95, 27, .3),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10))
+                                    ]),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 60,
+                                      width: width * 0.75,
+                                      child: Padding(
+                                        child: DirectSelectList<String>(
+                                            values:
+                                                _formData['dir_name'].length ==
+                                                        0
+                                                    ? ['Select Dir First']
+                                                    : _selectDivisions
+                                                        .map((e) => e.name)
+                                                        .toList(),
+                                            defaultItemIndex: 0,
+                                            itemBuilder: (String value) =>
+                                                getDropDownMenuItem(value),
+                                            focusedItemDecoration:
+                                                _getDslDecoration(),
+                                            onItemSelectedListener:
+                                                (item, index, context) {
+                                              if (_selectDivisions.isNotEmpty &&
+                                                  _selectDivisions != null) {
+                                                _formData = {
+                                                  ..._formData,
+                                                  'div_name': item
+                                                };
+                                              }
                                             }),
                                         padding: EdgeInsets.only(left: 12),
                                       ),
@@ -278,8 +455,7 @@ class _AddServiceState extends State<AddService> {
                                   setState(() {
                                     buttonState = ButtonState.loading;
                                   });
-                                  await _submit(
-                                      _dirController.text, _selectDep);
+                                  await _submit();
                                 }
                               },
                               state: buttonState,

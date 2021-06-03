@@ -6,6 +6,9 @@ class Department {
 
   factory Department.fromJson(Map<String, dynamic> json) {
     print(json.toString());
-    return Department(id: json['_id'], name: json['name']);
+    return Department(
+      id: json['_id'],
+      name: json['name'],
+    );
   }
 }

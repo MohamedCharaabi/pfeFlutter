@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:bottom_navigation/constants/formValidation.dart';
+import 'package:bottom_navigation/screens/admin_app/models/Direction.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
 import 'package:bottom_navigation/screens/admin_app/models/Department.dart';
@@ -20,23 +21,27 @@ class AddDivision extends StatefulWidget {
 
 class _AddDivisionState extends State<AddDivision> {
   TextEditingController _divController = new TextEditingController();
-  Map<String, String> _formData = {'name': '', 'dep_name': ''};
+  Map<String, String> _formData = {'name': '', 'dep_name': '', 'dir_name': ''};
   bool isLoading = true;
   String _selectDep = '';
-  List<String> fetchDepartments = [];
-  List<String> fetchDirections = [];
+  List<Department> fetchDepartments = [];
+  List<Direction> fetchDirections = [];
+  List<Direction> _selectDirections = [];
   ButtonState buttonState = ButtonState.idle;
   final _formKey = GlobalKey<FormState>();
   _submit(name, selectedDep) async {
-    var url = "https://pfe-cims.herokuapp.com/dir"; // iOS
+    var url = "https://pfe-cims.herokuapp.com/div";
 
     try {
       var result = await http.post(Uri.parse(url),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: jsonEncode(
-              <String, String>{'name': name, 'dep_name': selectedDep}));
+          body: jsonEncode(<String, String>{
+            'name': name,
+            'dep_name': _formData['dep_name'],
+            'dir_name': _formData['dir_name']
+          }));
       log(result.body);
       if (result.statusCode == 200) {
         setState(() {
@@ -76,21 +81,22 @@ class _AddDivisionState extends State<AddDivision> {
         await http.get(Uri.parse('https://pfe-cims.herokuapp.com/all'));
 
     if (response.statusCode == 200) {
-      List<String> deps = [];
-      List<String> dirs = [];
+      List<Department> deps = [];
+      List<Direction> dirs = [];
 
       var departments = json.decode(response.body)['departments'];
       var directions = json.decode(response.body)['directions'];
-
+      print('directions ==>  $directions');
       for (var dep in departments) {
         // deps.add(Department.fromJson(dep));
-        deps.add(dep['name']);
+        deps.add(Department.fromJson(dep));
       }
+      // directions.map<Direction>((dir) => dirs.add(Direction.fromJson(dir)));
       for (var dir in directions) {
         // deps.add(Department.fromJson(dir));
-        dirs.add(dir['name']);
+        dirs.add(Direction.fromJson(dir));
       }
-      log(' deps ===> $deps');
+      // log(' deps ===> $deps');
       setState(() {
         fetchDepartments = deps;
         fetchDirections = dirs;
@@ -196,6 +202,8 @@ class _AddDivisionState extends State<AddDivision> {
                                       return standarTextValidation(
                                           val, 'Division name');
                                     },
+                                    onChanged: (val) =>
+                                        _formData = {..._formData, 'name': val},
                                     keyboardType: TextInputType.text,
                                     decoration: InputDecoration(
                                         hintText: "Division name ",
@@ -231,7 +239,9 @@ class _AddDivisionState extends State<AddDivision> {
                                       width: width * 0.75,
                                       child: Padding(
                                         child: DirectSelectList<String>(
-                                            values: fetchDepartments,
+                                            values: fetchDepartments
+                                                .map((e) => e.name)
+                                                .toList(),
                                             defaultItemIndex: 0,
                                             itemBuilder: (String value) =>
                                                 getDropDownMenuItem(value),
@@ -240,6 +250,17 @@ class _AddDivisionState extends State<AddDivision> {
                                             onItemSelectedListener:
                                                 (item, index, context) {
                                               _selectDep = item;
+                                              _formData = {
+                                                ..._formData,
+                                                'dep_name': item
+                                              };
+                                              setState(() {
+                                                _selectDirections =
+                                                    fetchDirections
+                                                        .where((d) =>
+                                                            d.dep_name == item)
+                                                        .toList();
+                                              });
                                             }),
                                         padding: EdgeInsets.only(left: 12),
                                       ),
@@ -277,10 +298,16 @@ class _AddDivisionState extends State<AddDivision> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
-                                    Expanded(
+                                    Container(
+                                      height: 60,
+                                      width: width * 0.75,
                                       child: Padding(
                                         child: DirectSelectList<String>(
-                                            values: fetchDirections,
+                                            values: _selectDirections.isEmpty
+                                                ? ['Select Dep First']
+                                                : _selectDirections
+                                                    .map((e) => e.name)
+                                                    .toList(),
                                             defaultItemIndex: 0,
                                             itemBuilder: (String value) =>
                                                 getDropDownMenuItem(value),
@@ -288,7 +315,13 @@ class _AddDivisionState extends State<AddDivision> {
                                                 _getDslDecoration(),
                                             onItemSelectedListener:
                                                 (item, index, context) {
-                                              _selectDep = item;
+                                              _formData = {
+                                                ..._formData,
+                                                'dir_name': item
+                                              };
+                                              if (_selectDirections
+                                                      .isNotEmpty &&
+                                                  _selectDirections != null) {}
                                             }),
                                         padding: EdgeInsets.only(left: 12),
                                       ),
@@ -337,6 +370,7 @@ class _AddDivisionState extends State<AddDivision> {
                                   setState(() {
                                     buttonState = ButtonState.loading;
                                   });
+                                  log('{$_formData}');
                                   await _submit(
                                       _divController.text, _selectDep);
                                 }

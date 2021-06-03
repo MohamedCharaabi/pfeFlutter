@@ -186,6 +186,7 @@ class _LoginState extends State<Login> {
                                         },
                                         keyboardType:
                                             TextInputType.emailAddress,
+                                        // initialValue: "medch@yahoo.fr",
                                         decoration: InputDecoration(
                                             hintText: "Email ",
                                             hintStyle:
@@ -201,6 +202,7 @@ class _LoginState extends State<Login> {
                                                   color: Colors.grey[200]))),
                                       child: TextFormField(
                                         controller: _passController,
+                                        // initialValue: "12345",
                                         validator: (val) {
                                           return passwordlValidation(val);
                                         },
