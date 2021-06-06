@@ -81,6 +81,36 @@ class _DepartmentsState extends State<Departments> {
               height: height * 0.1,
               color: Colors.blueAccent,
               width: width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Container(
+                    color: Colors.red,
+                    height: height * 0.05,
+                    width: width * 0.2,
+                    child: Text(
+                      'Deps',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                  ),
+                  Center(
+                    child: Text('Dirs',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 18)),
+                  ),
+                  Container(
+                    child: Text('Divs',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 18)),
+                  ),
+                  Container(
+                    child: Text('Sers',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 18)),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: Container(
