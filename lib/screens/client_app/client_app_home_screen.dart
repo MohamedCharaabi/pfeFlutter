@@ -1,13 +1,14 @@
-import 'package:bottom_navigation/screens/admin_app/models/tabIcon_data.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/Home.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/Settings.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/Statistics.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/departments.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/levels.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/directions.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/divisions.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/reclamation.dart';
-import 'package:bottom_navigation/screens/admin_app/screens/services.dart';
+import 'package:bottom_navigation/screens/client_app/models/tabIcon_data.dart';
+import 'package:bottom_navigation/screens/client_app/screens/Home.dart';
+import 'package:bottom_navigation/screens/client_app/screens/Settings.dart';
+import 'package:bottom_navigation/screens/client_app/screens/Statistics.dart';
+import 'package:bottom_navigation/screens/client_app/screens/departments.dart';
+import 'package:bottom_navigation/screens/client_app/screens/levels.dart';
+import 'package:bottom_navigation/screens/client_app/screens/directions.dart';
+import 'package:bottom_navigation/screens/client_app/screens/divisions.dart';
+import 'package:bottom_navigation/screens/client_app/screens/reclamation.dart';
+import 'package:bottom_navigation/screens/client_app/screens/services.dart';
+import 'package:bottom_navigation/screens/client_app/screens/Home.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/drawer_user_controller.dart';
 import 'package:bottom_navigation/widgets/custom_drawer/home_drawer.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +16,12 @@ import 'bottom_navigation_view/bottom_bar_view.dart';
 import 'admin_app_theme.dart';
 import 'screens/Themes.dart';
 
-class AdminAppHomeScreen extends StatefulWidget {
+class ClientAppHomeScreen extends StatefulWidget {
   @override
-  _AdminAppHomeScreenState createState() => _AdminAppHomeScreenState();
+  _ClientAppHomeScreenState createState() => _ClientAppHomeScreenState();
 }
 
-class _AdminAppHomeScreenState extends State<AdminAppHomeScreen>
+class _ClientAppHomeScreenState extends State<ClientAppHomeScreen>
     with TickerProviderStateMixin {
   AnimationController animationController;
 

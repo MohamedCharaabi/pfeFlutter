@@ -48,7 +48,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       ),
       DrawerList(
         index: DrawerIndex.REQUESTS,
-        labelName: 'Requests',
+        labelName: 'Demmandes',
         isAssetsImage: true,
         imageName: 'assets/images/requestIcon.png',
       ),
@@ -60,28 +60,28 @@ class _HomeDrawerState extends State<HomeDrawer> {
       ),
       DrawerList(
         index: DrawerIndex.DEPARTMENTS,
-        labelName: 'Departments',
+        labelName: 'Niveaux',
         isAssetsImage: true,
         imageName: 'assets/images/departmentIcon.png',
       ),
-      DrawerList(
-        index: DrawerIndex.DIRECTIONS,
-        labelName: 'Directions',
-        isAssetsImage: true,
-        imageName: 'assets/images/directionIcon.png',
-      ),
-      DrawerList(
-        index: DrawerIndex.DIVISIONS,
-        labelName: 'Divisions',
-        isAssetsImage: true,
-        imageName: 'assets/images/divisionIcon.png',
-      ),
-      DrawerList(
-        index: DrawerIndex.SERVICES,
-        labelName: 'Services',
-        isAssetsImage: true,
-        imageName: 'assets/images/serviceIcon.png',
-      ),
+      // DrawerList(
+      //   index: DrawerIndex.DIRECTIONS,
+      //   labelName: 'Directions',
+      //   isAssetsImage: true,
+      //   imageName: 'assets/images/directionIcon.png',
+      // ),
+      // DrawerList(
+      //   index: DrawerIndex.DIVISIONS,
+      //   labelName: 'Divisions',
+      //   isAssetsImage: true,
+      //   imageName: 'assets/images/divisionIcon.png',
+      // ),
+      // DrawerList(
+      //   index: DrawerIndex.SERVICES,
+      //   labelName: 'Services',
+      //   isAssetsImage: true,
+      //   imageName: 'assets/images/serviceIcon.png',
+      // ),
     ];
   }
 
@@ -178,7 +178,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: <Widget>[
               ListTile(
                 title: Text(
-                  'Sign Out',
+                  'Deconnexion',
                   style: TextStyle(
                     fontFamily: AppTheme.fontName,
                     fontWeight: FontWeight.w600,

@@ -9,9 +9,6 @@ class CustomLineChart extends StatefulWidget {
 }
 
 class _CustomLineChartState extends State<CustomLineChart> {
-  // List<FlSpot> sppots = widget.monthRequest.map((e) => FlSpot(
-  //                 e['_id']['month'].toDouble(),
-  //                 e['nubr'].toDouble());
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -20,8 +17,8 @@ class _CustomLineChartState extends State<CustomLineChart> {
       height: height * 0.5,
       width: width * 0.9,
       child: LineChart(LineChartData(
-        minX: 5,
-        maxX: 11,
+        minX: 0,
+        maxX: 6,
         minY: 0,
         maxY: 24,
         gridData: FlGridData(
@@ -38,18 +35,12 @@ class _CustomLineChartState extends State<CustomLineChart> {
           border: Border.all(color: const Color(0xff37434d), width: 1),
         ),
         lineBarsData: [
-          LineChartBarData(
-              spots: widget.monthRequest
-                  .map((e) => FlSpot(
-                      e['_id']['month'].toDouble(), e['nubr'].toDouble()))
-                  .toList()
-              // FlSpot(widget.monthRequest[0]['_id']['month'].toDouble(),
-              //     widget.monthRequest[0]['nubr'].toDouble()),
-              // [
-              //   // FlSpot(widget.monthRequest[1]['_id']['month'].toDouble(),
-              //   //     widget.monthRequest[1]['nubr'].toDouble()),
-              // ]
-              ),
+          LineChartBarData(spots: [
+            FlSpot(widget.monthRequest[0]['_id']['month'].toDouble(),
+                widget.monthRequest[0]['nubr'].toDouble()),
+            // FlSpot(widget.monthRequest[1]['_id']['month'].toDouble(),
+            //     widget.monthRequest[1]['nubr'].toDouble()),
+          ]),
         ],
       )),
     );

@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:bottom_navigation/screens/admin_app/models/Request.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_app_theme.dart';
 import '../hexColor.dart';
@@ -22,6 +26,64 @@ class _FlipItemState extends State<FlipItem>
   Animation _animationFlip;
   bool anim = false;
   Widget visibleScreen = Container();
+  Map<String, dynamic> userData = {};
+  getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = jsonDecode(prefs.getString("userData"));
+    setState(() {
+      userData = data;
+      // _formData = {
+      //   'fullName': data['fullName'],
+      //   'password': data['password'],
+      //   'avatar': data['avatar'],
+      //   'email': data['email']
+      // };
+    });
+  }
+
+  Future acceptDem() async {
+    var req = widget.request;
+    var body = jsonEncode(<String, dynamic>{
+      'etatDem': req.etat,
+      'name': req.name,
+      'demmande': req,
+      'message': 'accepter par ${userData['fullName']}'
+    });
+    print(body);
+
+    try {
+      var result = await http.post(
+          Uri.parse('https://pfe-cims.herokuapp.com/request/accept/${req.id}'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: body);
+      print(result.body);
+
+      if (result.statusCode == 200) {
+        Fluttertoast.showToast(
+            msg: "Accepter!!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey.shade400,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Error $e",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+
+    print(
+        'Errorrr while parsing requests <<check getRequets methode in home >>');
+  }
 
   Widget getScreen(BuildContext context) {
     if (_animationFlip.value < 0.5) {
@@ -54,14 +116,23 @@ class _FlipItemState extends State<FlipItem>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'status: Encours',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
                       DateFormat('yyyy-MM-dd – kk:mm')
                           .format(DateTime.parse(widget.request.date)),
                       style: TextStyle(color: Colors.white),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        IconButton(
+                            onPressed: () async {
+                              // await acceptDem();
+                            },
+                            icon: Icon(Icons.check, color: Colors.green)),
+                        IconButton(
+                            onPressed: null,
+                            icon: Icon(Icons.delete, color: Colors.deepPurple)),
+                      ],
+                    )
                   ],
                 )
               ],
@@ -76,6 +147,8 @@ class _FlipItemState extends State<FlipItem>
 
   @override
   void initState() {
+    getUserData();
+
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 750),

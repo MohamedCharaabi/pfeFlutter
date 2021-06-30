@@ -6,12 +6,13 @@ import 'package:bottom_navigation/constants/Theme.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_theme.dart';
 import 'package:bottom_navigation/screens/admin_app/models/Request.dart';
 // import 'package:bottom_navigation/screens/admin_app/screens/flipTest.dart';
-import 'package:bottom_navigation/screens/admin_app/widgets/flipItem.dart';
+import 'package:bottom_navigation/screens/client_app/widgets/flipItem.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../hexColor.dart';
@@ -33,11 +34,27 @@ class _HomeState extends State<Home> {
     "facebook",
     "javascript",
   ];
-  Future<List<PersonalRequest>> getRequests() async {
-    var result =
-        await http.get(Uri.parse('https://pfe-cims.herokuapp.com/request'));
+  Map<String, dynamic> userData = {};
+  getUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = jsonDecode(prefs.getString("userData"));
+    setState(() {
+      userData = data;
+      // _formData = {
+      //   'fullName': data['fullName'],
+      //   'password': data['password'],
+      //   'avatar': data['avatar'],
+      //   'email': data['email']
+      // };
+    });
+  }
 
-    // print(result.body);
+  Future<List<PersonalRequest>> getRequests() async {
+    log(' dir ==> ${userData['Dir'].isEmpty ? 0 : userData['Dir']}');
+    var result = await http.get(Uri.parse(
+        'https://pfe-cims.herokuapp.com/request/filter/${userData['rolePer']}/${userData['Dep']}/${userData['Dir'].isEmpty ? 0 : userData['Dir']}/${userData['Div'].isEmpty ? 0 : userData['Div']}/${userData['Ser'].isEmpty ? 0 : userData['Ser']}'));
+
+    log(result.body);
     if (result.statusCode == 200) {
       var response = json.decode(result.body);
       List<PersonalRequest> requests = [];
@@ -62,6 +79,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    getUserData();
   }
 
   void _openFilterDialog() async {
@@ -142,6 +160,11 @@ class _HomeState extends State<Home> {
                       //         }));
 
                       // print("snapshot data ==> " + snapshot.data);
+                      if (snapshot.data.length < 1) {
+                        return Container(
+                            height: height - 100,
+                            child: Center(child: Text('Pas de demmandes!!')));
+                      }
                       return Container(
                         height: height,
                         width: width,
@@ -149,8 +172,7 @@ class _HomeState extends State<Home> {
                             padding: EdgeInsets.all(8),
                             itemCount: snapshot.data.length,
                             itemBuilder: (BuildContext context, int index) {
-                              PersonalRequest snap =
-                                  snapshot.data.reversed.toList()[index];
+                              PersonalRequest snap = snapshot.data[index];
                               String date = DateFormat('yMd')
                                   .format(DateTime.parse(snap.date));
                               String theme = snap.theme;

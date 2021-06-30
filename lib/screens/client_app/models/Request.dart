@@ -10,7 +10,6 @@ class PersonalRequest {
   final String dirName;
   final String divName;
   final String serName;
-  final int etat;
   final List<dynamic> history;
 
   PersonalRequest(
@@ -25,7 +24,6 @@ class PersonalRequest {
       this.dirName,
       this.divName,
       this.serName,
-      this.etat,
       this.history});
 
   factory PersonalRequest.fromJson(Map<String, dynamic> json) {
@@ -42,7 +40,6 @@ class PersonalRequest {
       dirName: json['dir_name'],
       divName: json['div_name'],
       serName: json['ser_name'],
-      etat: json['etatDem'],
       history: json['history'],
     );
   }

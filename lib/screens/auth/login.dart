@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bottom_navigation/constants/formValidation.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_home_screen.dart';
 import 'package:bottom_navigation/screens/admin_app/admin_app_theme.dart';
+import 'package:bottom_navigation/screens/client_app/client_app_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colored_progress_indicators/flutter_colored_progress_indicators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -42,7 +43,7 @@ class _LoginState extends State<Login> {
       print(' res ==> ${response.body}');
       if (response.statusCode == 200) {
         String role = jsonDecode(response.body)['userData']['role'];
-        if (role == 'admin') {
+        if (role != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           var userData = jsonDecode(response.body)["userData"];
           await prefs.setString('userData', jsonEncode(userData));
@@ -125,7 +126,7 @@ class _LoginState extends State<Login> {
                   FadeAnimation(
                       4,
                       Text(
-                        "Login",
+                        "Connexion",
                         style: TextStyle(color: Colors.white, fontSize: 40),
                       )),
                   SizedBox(
@@ -134,7 +135,7 @@ class _LoginState extends State<Login> {
                   FadeAnimation(
                       1.3,
                       Text(
-                        "Welcome Back",
+                        "Bienvenue",
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       )),
                 ],
@@ -217,7 +218,7 @@ class _LoginState extends State<Login> {
                                                   : Icons.visibility),
                                               onPressed: _toggle,
                                             ),
-                                            hintText: "Password",
+                                            hintText: "Mot de passe",
                                             hintStyle:
                                                 TextStyle(color: Colors.grey),
                                             border: InputBorder.none),
@@ -232,7 +233,7 @@ class _LoginState extends State<Login> {
                           FadeAnimation(
                               1.5,
                               Text(
-                                "Forgot Password?",
+                                "",
                                 style: TextStyle(color: Colors.grey),
                               )),
                           SizedBox(
@@ -243,20 +244,20 @@ class _LoginState extends State<Login> {
                             ProgressButton.icon(
                               iconedButtons: {
                                 ButtonState.idle: IconedButton(
-                                    text: "Login",
+                                    text: "Conexion",
                                     icon:
                                         Icon(Icons.login, color: Colors.white),
                                     color: Colors.deepPurple.shade500),
                                 ButtonState.loading: IconedButton(
-                                    text: "Loading",
+                                    text: "Chargement",
                                     color: Colors.deepPurple.shade700),
                                 ButtonState.fail: IconedButton(
-                                    text: "Failed",
+                                    text: "Echec",
                                     icon:
                                         Icon(Icons.cancel, color: Colors.white),
                                     color: Colors.red.shade300),
                                 ButtonState.success: IconedButton(
-                                    text: "Success",
+                                    text: "Succès",
                                     icon: Icon(
                                       Icons.check_circle,
                                       color: Colors.white,
@@ -278,11 +279,21 @@ class _LoginState extends State<Login> {
                                   String userData = prefs.getString("userData");
                                   // print('userData ==> $userData');
                                   if (userData != null) {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdminAppHomeScreen()));
+                                    Map<String, dynamic> data =
+                                        jsonDecode(userData);
+                                    if (data['role'] == 'admin') {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AdminAppHomeScreen()));
+                                    } else {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ClientAppHomeScreen()));
+                                    }
                                   }
                                 }
                               },
